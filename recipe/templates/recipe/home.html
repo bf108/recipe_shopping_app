@@ -1,0 +1,16 @@
+{% extends "recipe/base.html" %}
+
+{% block content %}
+	{% for recipe in recipes %}
+        <article class="media content-section">
+          <div class="media-body">
+            <div class="article-metadata">
+              <a class="mr-2" href="#">{{ recipe }}</a>
+              <!-- <small class="text-muted">{{ post.date_posted|date:"d M Y"}}</small> -->
+            </div>
+            <!-- <h2><a class="article-title" href="#">{{ post.title }}</a></h2> -->
+            <!-- <p class="article-content">{{recipe}}</p> -->
+          </div>
+        </article>
+	{% endfor %}
+{% endblock content %}
