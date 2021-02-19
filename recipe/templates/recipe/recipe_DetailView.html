@@ -1,0 +1,25 @@
+{% extends "recipe/base.html" %}
+
+{% block content %}
+<article class="media content-section">
+  <div class="media-body">
+    <div class="article-metadata">
+      <h3>{{ recipe }}</h3>
+      <table style="width:100%">
+        <tr>
+          <th>Ingredients</th>
+          <th>Qty</th>
+          <th>Units</th>
+        </tr>
+        {% for ingredient in ingredients %}
+          <tr>
+            <td>{{ ingredient.title }}</td>
+            <td>{{ ingredient.qty }}</td>
+            <td>{{ ingredient.units }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+</article>
+{% endblock content %}
