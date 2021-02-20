@@ -29,6 +29,7 @@ def RecipeView(request, title):
 class IngredientCreateView(CreateView):
 	model = Ingredient
 	fields = ['title','qty','units']
+	template_name = 'recipe/ingredient_add.html'
 
 	def get_context_data(self, **kwargs):
 		#Update get_context_data method to pass recipe title along with ingredient object to view/html template
@@ -48,4 +49,22 @@ class IngredientCreateView(CreateView):
 
 	# def get_success_url(self):
 	# 	return reverse('detail_recipe', kwargs={'title':self.Recipe.title})
+
+class IngredientUpdateView(UpdateView):
+	model = Ingredient
+	fields = ['title','qty','units']
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		#Add a new key value pair to context dict
+		context['recipe'] = self.kwargs['title']
+		context['ingredients'] = Ingredient.objects.filter(recipe__title=self.kwargs['title'])
+		return context
+	
+	def form_valid(self, form):
+		#Update form_valid method to assign recipe to Foreign Key value of model.
+		rec = Recipe.objects.filter(title=self.kwargs['title'])[0]
+		form.instance.recipe = rec
+		return super().form_valid(form)
+
 
