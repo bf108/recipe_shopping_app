@@ -16,9 +16,13 @@
             <td>{{ ingredient.title }}</td>
             <td>{{ ingredient.qty }}</td>
             <td>{{ ingredient.units }}</td>
+            <th><a href="#">Update</a></th>
           </tr>
         {% endfor %}
       </table>
+    </div>
+    <div class="form-group">
+        <a href="{% url 'ingredient_create' recipe.title %}">Add Ingredient</a>
     </div>
   </div>
 </article>
