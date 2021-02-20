@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 # Create your models here.
 
@@ -31,3 +32,6 @@ class Ingredient(models.Model):
 			text = f'{self.title}: {self.qty}'
 
 		return text
+
+	def get_absolute_url(self):
+		return reverse('ingredient_create', kwargs={'title':self.recipe.title})
