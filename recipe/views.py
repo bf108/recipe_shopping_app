@@ -82,3 +82,6 @@ class IngredientDeleteView(DeleteView):
 	def get_success_url(self):
 		return reverse_lazy('ingredient_create',kwargs={'title':self.kwargs['title']})
 
+class RecipeCreateView(CreateView):
+	model = Recipe
+	fields = ['title','description']

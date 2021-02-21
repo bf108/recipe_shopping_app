@@ -16,6 +16,9 @@ class Recipe(models.Model):
 	def __str__(self):
 		return f'{self.title}: {self.description}'
 
+	def get_absolute_url(self):
+		return reverse('ingredient_create', kwargs={'title':self.title})
+
 class Ingredient(models.Model):
 	title = models.CharField(max_length=100)
 	qty = models.FloatField(default=1)
