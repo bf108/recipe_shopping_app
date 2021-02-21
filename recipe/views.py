@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .models import Recipe, Ingredient
-from django.views.generic import DetailView, CreateView, UpdateView
-from django.urls import reverse
+from django.views.generic import DetailView, CreateView, UpdateView, DeleteView
+from django.urls import reverse, reverse_lazy
 
 # Create your views here.
 
@@ -67,4 +67,18 @@ class IngredientUpdateView(UpdateView):
 		form.instance.recipe = rec
 		return super().form_valid(form)
 
+class IngredientDeleteView(DeleteView):
+	model = Ingredient
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		#Add a new key value pair to context dict
+		context['recipe'] = self.kwargs['title']
+		context['ingredients'] = Ingredient.objects.filter(recipe__title=self.kwargs['title'])
+		return context
+
+
+	# To pass url variables to success url you have to modify/overwrite the get_success_url method 
+	def get_success_url(self):
+		return reverse_lazy('ingredient_create',kwargs={'title':self.kwargs['title']})
 
