@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import Recipe, Ingredient
-from django.views.generic import DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import DetailView, CreateView, UpdateView, DeleteView, ListView
 from django.urls import reverse, reverse_lazy
 
 # Create your views here.
@@ -11,9 +11,16 @@ def listRecipe(request):
 
 	return render(request,'recipe/home.html',context={'recipes':recipes})
 
+class RecipeListView(ListView):
+	model = Recipe
+
 class RecipeDetailView(DetailView):
 	model = Recipe
 	template_name = 'recipe/recipe_DetailView.html' #This is standard naming convention for class based view
+
+class RecipeCreateView(CreateView):
+	model = Recipe
+	fields = ['title','description']
 
 def RecipeView(request, title):
 
@@ -81,7 +88,3 @@ class IngredientDeleteView(DeleteView):
 	# To pass url variables to success url you have to modify/overwrite the get_success_url method 
 	def get_success_url(self):
 		return reverse_lazy('ingredient_create',kwargs={'title':self.kwargs['title']})
-
-class RecipeCreateView(CreateView):
-	model = Recipe
-	fields = ['title','description']
