@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .models import Recipe, Ingredient
 from django.views.generic import DetailView, CreateView, UpdateView, DeleteView, ListView
 from django.urls import reverse, reverse_lazy
@@ -22,16 +22,9 @@ class RecipeCreateView(CreateView):
 	model = Recipe
 	fields = ['title','description']
 
-def RecipeView(request, title):
-
-	recipe = ' '.join(Recipe.objects.filter(title=title)[0].title.split('_'))
-
-	pk = Recipe.objects.filter(title=title)[0].id
-	ingredients = Ingredient.objects.filter(recipe_id=pk)
-
-	context = {'recipe':recipe, 'ingredients':ingredients}
-
-	return render(request, 'recipe/recipe_DetailView.html', context=context)
+class RecipeUpdateView(UpdateView):
+	model = Recipe
+	fields = ['title','description']
 
 class IngredientCreateView(CreateView):
 	model = Ingredient
@@ -45,6 +38,7 @@ class IngredientCreateView(CreateView):
 		context = super().get_context_data(**kwargs)
 		#Add a new key value pair to context dict
 		context['recipe'] = self.kwargs['title']
+		context['pk'] = Recipe.objects.filter(title=self.kwargs['title'])[0].id
 		context['ingredients'] = Ingredient.objects.filter(recipe__title=self.kwargs['title'])
 		return context
 	
@@ -65,6 +59,7 @@ class IngredientUpdateView(UpdateView):
 		context = super().get_context_data(**kwargs)
 		#Add a new key value pair to context dict
 		context['recipe'] = self.kwargs['title']
+		context['pk'] = Recipe.objects.filter(title=self.kwargs['title'])[0].id
 		context['ingredients'] = Ingredient.objects.filter(recipe__title=self.kwargs['title'])
 		return context
 	
