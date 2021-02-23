@@ -4,25 +4,40 @@
 <article class="media content-section">
   <div class="media-body">
     <div class="article-metadata">
-      <h3>{{ recipe }}</h3>
-      <table style="width:100%">
+      <table>
+        <tr>
+          <td><h3>{{ recipe.title }}</h3></td>
+          <td><a href="{% url 'recipe_update' recipe.title recipe.id %}">Update Recipe</a></td>
+        </tr>
+        <tr class="blank_row">
+            <td bgcolor="#FFFFFF" style="line-height:10px;" colspan=3>&nbsp;</td>
+        </tr>
+        <tr>
+          <th>Description</th>
+        </tr>
+        <tr>
+          {% if recipe.description == None %}
+            <td>No description available</td>
+          {% else %}
+            <td>{{recipe.description}}</td>
+          {% endif %}
+        </tr>
+        <tr class="blank_row">
+            <td bgcolor="#FFFFFF" style="line-height:10px;" colspan=3>&nbsp;</td>
+        </tr>
         <tr>
           <th>Ingredients</th>
           <th>Qty</th>
           <th>Units</th>
         </tr>
-        {% for ingredient in ingredients %}
+        {% for ingredient in recipe.ingredient_set.all %}
           <tr>
             <td>{{ ingredient.title }}</td>
             <td>{{ ingredient.qty }}</td>
             <td>{{ ingredient.units }}</td>
-            <th><a href="#">Update</a></th>
           </tr>
         {% endfor %}
       </table>
-    </div>
-    <div class="form-group">
-        <a href="{% url 'ingredient_create' recipe.title %}">Add Ingredient</a>
     </div>
   </div>
 </article>
