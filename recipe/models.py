@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.contrib.auth import get_user_model
 
 # Create your models here.
 
@@ -38,3 +39,11 @@ class Ingredient(models.Model):
 
 	def get_absolute_url(self):
 		return reverse('ingredient_create', kwargs={'title':self.recipe.title})
+
+class ShoppingList(models.Model):
+	user = models.OneToOneField(
+		get_user_model(),
+		primary_key=True,
+		on_delete=models.CASCADE)
+
+	meals = models.ManyToManyField(Recipe)
