@@ -26,6 +26,13 @@ class RecipeUpdateView(UpdateView):
 	model = Recipe
 	fields = ['title','description']
 
+class RecipeDeleteView(DeleteView):
+	model = Recipe
+
+	# To pass url variables to success url you have to modify/overwrite the get_success_url method 
+	def get_success_url(self):
+		return reverse_lazy('recipe_list')
+
 class IngredientCreateView(CreateView):
 	model = Ingredient
 	fields = ['title','qty','units']
@@ -78,7 +85,6 @@ class IngredientDeleteView(DeleteView):
 		context['recipe'] = self.kwargs['title']
 		context['ingredients'] = Ingredient.objects.filter(recipe__title=self.kwargs['title'])
 		return context
-
 
 	# To pass url variables to success url you have to modify/overwrite the get_success_url method 
 	def get_success_url(self):
