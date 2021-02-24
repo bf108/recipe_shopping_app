@@ -8,6 +8,7 @@
               <a class="mr-2" href="{% url 'recipe_detail' recipe.title recipe.id %}">{{ recipe.title }}</a>
               <p>{{recipe.description}}</p>
             </div>
+            <a href="{% url 'recipe_delete' recipe.title recipe.id %}">Delete Recipe</a>
           </div>
         </article>
 	{% endfor %}
