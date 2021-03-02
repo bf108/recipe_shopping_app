@@ -34,6 +34,7 @@
             {% if user.is_authenticated %}
               <div class="navbar-nav">
                 <a class="nav-item nav-link" href="{% url 'recipe_create' %}">Create Recipe</a>
+                <a class="nav-item nav-link" href="{% url 'shoppingList_detail' user.id %}">View Shopping List</a>
             </div>
             {% else %}
               <div class="navbar-nav">

@@ -1,0 +1,27 @@
+{% extends "recipe/base.html" %}
+
+{% block content %}
+  <h4 style="text-align:center"> This weeks meal selection:</h4>
+  <ol style="text-align:center; list-style-position: inside">
+  {% for recipe in object.meals.all %}
+    <li><a href="{% url 'recipe_detail' recipe.title recipe.pk %}">{{ recipe.title }}</a></li>
+  {% endfor %}
+  </ol>
+  <h4 style="text-align:center">Items to purchased:</h4>
+  <table  style="margin-left: auto;margin-right: auto;text-align:left">
+    <tr>
+      <th>Ingredients</th>
+      <th>Qty</th>
+    </tr>
+    {% for ing, val in ingredients.items %}
+      <tr>
+        <td>{{ ing }}</td>
+        {% if val.units == None %}
+          <td>{{ val.qty }}</td>
+        {% else %}
+          <td>{{ val.qty }}{{ val.units }}</td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+  </table>
+{% endblock content %}

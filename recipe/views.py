@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Recipe, Ingredient
+from .models import Recipe, Ingredient, ShoppingList
 from django.views.generic import DetailView, CreateView, UpdateView, DeleteView, ListView
 from django.urls import reverse, reverse_lazy
 
@@ -89,3 +89,28 @@ class IngredientDeleteView(DeleteView):
 	# To pass url variables to success url you have to modify/overwrite the get_success_url method 
 	def get_success_url(self):
 		return reverse_lazy('ingredient_create',kwargs={'title':self.kwargs['title']})
+
+class ShoppingDetailView(DetailView):
+	model = ShoppingList
+	template_name = 'recipe/spl_DetailView.html'
+
+	def get_context_data(self, **kwargs):
+		#Update get_context_data method to pass recipe title along with ingredient object to view/html template
+		#This is the same as adding an argument to a view function
+		#Get base context
+		context = super().get_context_data(**kwargs)
+		context['new'] = 'RandomText'
+		recipes = [rec.title for rec in ShoppingList.objects.get(pk=self.kwargs['pk']).meals.all()]
+
+		toBuy = dict()
+
+		for recipe in recipes:
+			for ingredient in Ingredient.objects.filter(recipe__title=recipe).all():
+				if ingredient.title.lower() in toBuy:
+					toBuy[ingredient.title.lower()]["qty"]+=ingredient.qty
+				else:
+					toBuy[ingredient.title.lower()] = {"qty":ingredient.qty,"units":ingredient.units}
+
+		context['ingredients'] = toBuy
+
+		return context
