@@ -1,7 +1,8 @@
 {% extends "recipe/base.html" %}
 
 {% block content %}
-  <h4 style="text-align:center"> This weeks meal selection:</h4>
+  <h4 style="text-align:center"> Meal Plan:</h4>
+  <p class="text-muted" style="text-align:center">Fancy some different meals?<a href="{% url 'shoppingList_update' object.pk %}">Update Meals</a></p>
   <ol style="text-align:center; list-style-position: inside">
   {% for recipe in object.meals.all %}
     <li><a href="{% url 'recipe_detail' recipe.title recipe.pk %}">{{ recipe.title }}</a></li>
