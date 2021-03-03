@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from .models import Recipe, Ingredient, ShoppingList
 from django.views.generic import DetailView, CreateView, UpdateView, DeleteView, ListView
 from django.urls import reverse, reverse_lazy
+from .forms import CreateShoppingListForm
 
 # Create your views here.
 
@@ -114,3 +115,11 @@ class ShoppingDetailView(DetailView):
 		context['ingredients'] = toBuy
 
 		return context
+
+class ShoppingUpdateView(UpdateView):
+	model = ShoppingList
+	form_class = CreateShoppingListForm
+	# fields = ['meals']
+
+	def get_success_url(self):
+		return reverse('shoppingList_detail', kwargs={'pk':self.kwargs['pk']})

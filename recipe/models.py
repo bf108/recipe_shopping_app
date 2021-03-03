@@ -46,4 +46,4 @@ class ShoppingList(models.Model):
 		primary_key=True,
 		on_delete=models.CASCADE)
 
-	meals = models.ManyToManyField(Recipe)
+	meals = models.ManyToManyField(Recipe, blank=True, null=True)
