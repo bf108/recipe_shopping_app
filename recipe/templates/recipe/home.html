@@ -1,13 +1,17 @@
 {% extends "recipe/base.html" %}
 
 {% block content %}
-	{% for recipe in recipes %}
-        <article class="media content-section">
-          <div class="media-body">
-            <div class="article-metadata">
-              <a class="mr-2" href="{% url 'ingredient_create' recipe.title %}">{{ recipe.title }}</a>
-            </div>
-          </div>
-        </article>
-	{% endfor %}
+	{% if from %}
+		<h2>Thank you {{from}}. We received your mail!</h2>
+	{% else %}
+		{% for recipe in recipes %}
+	        <article class="media content-section">
+	          <div class="media-body">
+	            <div class="article-metadata">
+	              <a class="mr-2" href="{% url 'ingredient_create' recipe.title %}">{{ recipe.title }}</a>
+	            </div>
+	          </div>
+	        </article>
+		{% endfor %}
+	{% endif %}
 {% endblock content %}

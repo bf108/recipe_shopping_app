@@ -3,6 +3,9 @@ from .models import Recipe, Ingredient, ShoppingList
 from django.views.generic import DetailView, CreateView, UpdateView, DeleteView, ListView
 from django.urls import reverse, reverse_lazy
 from .forms import CreateShoppingListForm
+from django.core.mail import send_mail
+from django.contrib import messages
+from django.http import HttpResponseRedirect
 
 # Create your views here.
 
@@ -100,7 +103,6 @@ class ShoppingDetailView(DetailView):
 		#This is the same as adding an argument to a view function
 		#Get base context
 		context = super().get_context_data(**kwargs)
-		context['new'] = 'RandomText'
 		recipes = [rec.title for rec in ShoppingList.objects.get(pk=self.kwargs['pk']).meals.all()]
 
 		toBuy = dict()
@@ -119,7 +121,33 @@ class ShoppingDetailView(DetailView):
 class ShoppingUpdateView(UpdateView):
 	model = ShoppingList
 	form_class = CreateShoppingListForm
-	# fields = ['meals']
 
 	def get_success_url(self):
 		return reverse('shoppingList_detail', kwargs={'pk':self.kwargs['pk']})
+
+def sendEmail(request):
+
+	recipes = [rec.title for rec in ShoppingList.objects.get(pk=request.user.id).meals.all()]
+
+	toBuy = dict()
+
+	for recipe in recipes:
+		for ingredient in Ingredient.objects.filter(recipe__title=recipe).all():
+			if ingredient.title.lower() in toBuy:
+				toBuy[ingredient.title.lower()]["qty"]+=ingredient.qty
+			else:
+				toBuy[ingredient.title.lower()] = {"qty":ingredient.qty,"units":ingredient.units}
+
+	msg_content = '\n'.join([f'{key}: {toBuy[key].get("qty")}{toBuy[key].get("units","") if toBuy[key].get("units","") else ""}' for key in toBuy])
+
+	send_mail(
+		'This weeks shopping list!',
+		msg_content,
+		'farrellben2020@gmail.com',
+		['ben.farrell08@gmail.com','maddieross@gmail.com'],
+		fail_silently=False,
+		)
+
+	messages.add_message(request, messages.SUCCESS, 'Shopping list emailed to Ben & Maddie!')
+
+	return HttpResponseRedirect(reverse('shoppingList_detail',args=[request.user.id]))

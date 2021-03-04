@@ -8,6 +8,14 @@
     <li><a href="{% url 'recipe_detail' recipe.title recipe.pk %}">{{ recipe.title }}</a></li>
   {% endfor %}
   </ol>
+  <br>
+  <br>
+  <center>
+    <h4>Email Shopping List</h4>
+    <a href="{% url 'sendEmail' %}">Send Email</a>
+  </center>
+  <br>
+  <br>
   <h4 style="text-align:center">Items to purchased:</h4>
   <table  style="margin-left: auto;margin-right: auto;text-align:left">
     <tr>

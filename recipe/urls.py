@@ -10,6 +10,7 @@ from .views import (RecipeDetailView,
 	IngredientDeleteView,
     ShoppingDetailView,
     ShoppingUpdateView,
+    sendEmail,
 
     )
 
@@ -24,5 +25,7 @@ urlpatterns = [
     path('recipe/<str:title>/delete/<int:pk>/', IngredientDeleteView.as_view(), name='ingredient_delete'),
     path('shopping_list/<int:pk>/',ShoppingDetailView.as_view(), name='shoppingList_detail'),
     path('shopping_list/update/<int:pk>/',ShoppingUpdateView.as_view(), name='shoppingList_update'),
+    path('shopping_list/sendEmail',sendEmail, name='sendEmail'),
+
 
 ]
