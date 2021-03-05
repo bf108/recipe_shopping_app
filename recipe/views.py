@@ -39,7 +39,7 @@ class RecipeDeleteView(DeleteView):
 
 class IngredientCreateView(CreateView):
 	model = Ingredient
-	fields = ['title','qty','units']
+	fields = ['title','qty','units','food_type']
 	template_name = 'recipe/ingredient_add.html'
 
 	def get_context_data(self, **kwargs):
@@ -64,7 +64,7 @@ class IngredientCreateView(CreateView):
 
 class IngredientUpdateView(UpdateView):
 	model = Ingredient
-	fields = ['title','qty','units']
+	fields = ['title','qty','units','food_type']
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -94,6 +94,38 @@ class IngredientDeleteView(DeleteView):
 	def get_success_url(self):
 		return reverse_lazy('ingredient_create',kwargs={'title':self.kwargs['title']})
 
+#Helper function to group ingredients in Shopping List
+def groupIngredients(recipes):
+	'''
+	Group ingredients by food type
+
+	args: recipes (type: list) - List of recipes in shopping list
+	
+	returns: Dict in format: {'food_type': {'Ingredient': {'qty':x, 'units':7} } }
+
+	'''
+
+	toBuy = dict()
+
+	for recipe in recipes:
+		for ingredient in Ingredient.objects.filter(recipe__title=recipe).all():
+			if ingredient.food_type in toBuy:
+				if ingredient.title.lower() in toBuy[ingredient.food_type]:
+					toBuy[ingredient.food_type][ingredient.title.lower()]["qty"]+=ingredient.qty
+				else:
+					toBuy[ingredient.food_type][ingredient.title.lower()] = {
+					"qty":ingredient.qty,
+					"units":ingredient.units
+					}
+			else:
+				toBuy[ingredient.food_type] = {ingredient.title.lower():{
+				"qty":ingredient.qty,
+				"units":ingredient.units
+				}
+				}
+
+	return toBuy
+
 class ShoppingDetailView(DetailView):
 	model = ShoppingList
 	template_name = 'recipe/spl_DetailView.html'
@@ -103,18 +135,10 @@ class ShoppingDetailView(DetailView):
 		#This is the same as adding an argument to a view function
 		#Get base context
 		context = super().get_context_data(**kwargs)
+		
 		recipes = [rec.title for rec in ShoppingList.objects.get(pk=self.kwargs['pk']).meals.all()]
 
-		toBuy = dict()
-
-		for recipe in recipes:
-			for ingredient in Ingredient.objects.filter(recipe__title=recipe).all():
-				if ingredient.title.lower() in toBuy:
-					toBuy[ingredient.title.lower()]["qty"]+=ingredient.qty
-				else:
-					toBuy[ingredient.title.lower()] = {"qty":ingredient.qty,"units":ingredient.units}
-
-		context['ingredients'] = toBuy
+		context['ingredients'] = groupIngredients(recipes)
 
 		return context
 
@@ -126,25 +150,48 @@ class ShoppingUpdateView(UpdateView):
 		return reverse('shoppingList_detail', kwargs={'pk':self.kwargs['pk']})
 
 def sendEmail(request):
+	'''
+	This function/view performs 3 distinct things:
+	1. Creates a dict toBuy which groups ingredients by food type. 
+	{'food_type':
+		{'Ingredient':
+				{'qty':x, 'units':7}
+		}
+	}
 
+	2. Create email body with contents of toBuy dict
+	3. Group and sorted contents of shopping list are emailed to users.
+
+	'''
 	recipes = [rec.title for rec in ShoppingList.objects.get(pk=request.user.id).meals.all()]
 
-	toBuy = dict()
+	def createEmailBody():
 
-	for recipe in recipes:
-		for ingredient in Ingredient.objects.filter(recipe__title=recipe).all():
-			if ingredient.title.lower() in toBuy:
-				toBuy[ingredient.title.lower()]["qty"]+=ingredient.qty
-			else:
-				toBuy[ingredient.title.lower()] = {"qty":ingredient.qty,"units":ingredient.units}
+		toBuy = groupIngredients(recipes)
 
-	msg_content = '\n'.join([f'{key}: {toBuy[key].get("qty")}{toBuy[key].get("units","") if toBuy[key].get("units","") else ""}' for key in toBuy])
+		msg_content = []
 
+		for key in toBuy:
+			msg_content.append(key)
+			for ing, val in toBuy[key].items():
+				if val.get('units') == None:
+					comb = f'{ing}: {val.get("qty")}'
+				else:
+					comb = f'{ing}: {val.get("qty")}{val.get("units")}'
+				
+				msg_content.append(comb)
+
+			msg_content.append('\n')
+
+		msg_content = '\n'.join(msg_content)
+
+		return msg_content
+	
 	send_mail(
 		'This weeks shopping list!',
-		msg_content,
+		createEmailBody(),
 		'farrellben2020@gmail.com',
-		['ben.farrell08@gmail.com','maddieross@gmail.com'],
+		['ben.farrell08@gmail.com'],#,'maddieross@gmail.com'],
 		fail_silently=False,
 		)
 
