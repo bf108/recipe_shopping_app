@@ -1,7 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-
+from django.utils.translation import gettext_lazy as _
 # Create your models here.
 
 # Relationship between ingredients and Recipe was considered.
@@ -28,6 +28,19 @@ class Ingredient(models.Model):
 	units = models.CharField(blank=True,null=True,choices=UnitType.choices,max_length=5)
 
 	recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+
+	class FoodType(models.TextChoices):
+		VEGETABLE = 'VEG', _('Vegetable')
+		FRUIT = 'FRUIT', _('Fruit')
+		MEAT = 'MEAT', _('Meat')
+		DAIRY = 'DAIRY', _('Dairy')
+		OTHER = 'OTHER', _('Other')
+
+	food_type = models.CharField(
+		null=True,
+		choices=FoodType.choices,
+		max_length=15,
+		default=FoodType.OTHER)
 
 	def __str__(self):
 		if self.units:
