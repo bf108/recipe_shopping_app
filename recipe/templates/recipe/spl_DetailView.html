@@ -16,21 +16,27 @@
   </center>
   <br>
   <br>
-  <h4 style="text-align:center">Items to purchased:</h4>
-  <table  style="margin-left: auto;margin-right: auto;text-align:left">
-    <tr>
-      <th>Ingredients</th>
-      <th>Qty</th>
-    </tr>
-    {% for ing, val in ingredients.items %}
-      <tr>
-        <td>{{ ing }}</td>
-        {% if val.units == None %}
-          <td>{{ val.qty }}</td>
-        {% else %}
-          <td>{{ val.qty }}{{ val.units }}</td>
-        {% endif %}
-      </tr>
+  <h4 style="text-align:center">Shopping List:</h4>
+  <center>
+    {% for f_type, ing_dict in ingredients.items %}
+      <table>
+        <caption style="caption-side: top; text-align: center;">{{f_type}}</caption>
+        <tr>
+          <th>Ingredients</th>
+          <th>Qty</th>
+        </tr>
+        {% for ing, val in ing_dict.items %}
+          <tr>
+            <td>{{ ing }}</td>
+            {% if val.units == None %}
+              <td>{{ val.qty }}</td>
+            {% else %}
+              <td>{{ val.qty }}{{ val.units }}</td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </table>
     {% endfor %}
-  </table>
+      <br>
+  </center>
 {% endblock content %}
