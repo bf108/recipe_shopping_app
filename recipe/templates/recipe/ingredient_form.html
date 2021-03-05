@@ -1,28 +1,6 @@
 {% extends "recipe/base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
-<!--     <article class="media content-section">
-      <div class="media-body">
-        <div class="article-metadata">
-          <h3>{{ recipe }}</h3>
-          <table style="width:100%">
-            <tr>
-              <th>Ingredients</th>
-              <th>Qty</th>
-              <th>Units</th>
-            </tr>
-            {% for ingredient in ingredients %}
-              <tr>
-                <td>{{ ingredient.title }}</td>
-                <td>{{ ingredient.qty }}</td>
-                <td>{{ ingredient.units }}</td>
-                <th><a href="#">Update</a></th>
-              </tr>
-            {% endfor %}
-          </table>
-        </div>
-      </div>
-    </article> -->
     <div class="content-section">
         <form method="POST">
             {% csrf_token %}
