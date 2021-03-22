@@ -1,6 +1,7 @@
 {% extends "recipe/base.html" %}
 
 {% block content %}
+  <center>
 	{% for recipe in object_list %}
         <article class="media content-section">
           <div class="media-body">
@@ -8,8 +9,9 @@
               <a class="mr-2" href="{% url 'recipe_detail' recipe.title recipe.id %}">{{ recipe.title }}</a>
               <p>{{recipe.description}}</p>
             </div>
-            <a href="{% url 'recipe_delete' recipe.title recipe.id %}">Delete Recipe</a>
+            <a class="btn btn-outline-danger btn-sm" href="{% url 'recipe_delete' recipe.title recipe.id %}">Delete Recipe</a>
           </div>
         </article>
 	{% endfor %}
+  </center>
 {% endblock content %}
