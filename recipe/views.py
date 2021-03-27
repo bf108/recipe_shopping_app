@@ -172,6 +172,8 @@ class ShoppingDetailView(DetailView):
 		
 		recipes = [rec.title for rec in ShoppingList.objects.get(pk=self.kwargs['pk']).meals.all()]
 
+		context['recipes'] = recipes
+
 		context['ingredients'] = groupIngredients(recipes)
 
 		context['ingredient_list'] = groupListIngredients(recipes)

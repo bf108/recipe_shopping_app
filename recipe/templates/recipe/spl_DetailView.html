@@ -73,13 +73,25 @@
   </center> -->
 
   <script type="text/javascript">
-   var token = "{{csrf_token}}"
+
+   function formatter(x){
+    x = x.replaceAll('&amp;',"&");
+    x = x.replaceAll('&#x27;',"");
+    x = x.replaceAll('None',"");
+    x = x.replace("[","");
+    x = x.replace("]","");
+    x = x.split(',');
+
+    return x
+   }
+
+   var recipeList = "{{recipes}}";
+   var token = "{{csrf_token}}";
    var testVar = "{{ingredient_list}}";
-   testVar = testVar.replaceAll('&#x27;',"");
-   testVar = testVar.replaceAll('None',"");
-   testVar = testVar.replace("[","");
-   testVar = testVar.replace("]","");
-   testVar = testVar.split(',');
+
+   recipeList = formatter(recipeList);
+   recipeList.unshift('RECIPES')
+   testVar = formatter(testVar);
 
    // list of dictionaries [{'title':carrot:2,'Status':false}]
 
@@ -208,12 +220,19 @@
 
    function concatTodos(){
     
-    var final = [];
+    var final = recipeList;
+    final.push('\n')
+
     todos.forEach(item => {
-      if(item.Status == false){
-        final.push(item.title)
+      // Add line break for different food groups
+      if (item.title == item.title.toUpperCase()){
+        final.push('\n');
       }
-    })
+      // Add all no strikethrough items to list
+      if(item.Status == false){
+        final.push(item.title);
+      }
+      });
 
     return final.join('\n');
    }
