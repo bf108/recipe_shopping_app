@@ -2,7 +2,7 @@
 
 {% block content %}
   <h4 style="text-align:center"> Meal Plan:</h4>
-  <p class="text-muted" style="text-align:center">Fancy some different meals?<a href="{% url 'shoppingList_update' object.pk %}">Update Meals</a></p>
+  <p class="text-muted" style="text-align:center">Fancy some different meals?<a href="{% url 'shoppingList_update' object.pk %}"> Update Meals Here!</a></p>
   <ol style="text-align:center; list-style-position: inside">
   {% for recipe in object.meals.all %}
     <li><a href="{% url 'recipe_detail' recipe.title recipe.pk %}">{{ recipe.title }}</a></li>
@@ -12,12 +12,44 @@
   <br>
   <center>
     <h4>Email Shopping List</h4>
-    <a href="{% url 'sendEmail' %}">Send Email</a>
+    <button type="button" class="btn btn-primary">Email Shopping List</button>
+    <!-- Link to static email view -->
+    <!-- <a href="{% url 'sendEmail' %}">Send Email</a> -->
   </center>
   <br>
-  <br>
-  <h4 style="text-align:center">Shopping List:</h4>
   <center>
+      <h4 style="text-align:center">Shopping List:</h4>
+      <div>
+        <button id='toggleTodosButton' class='btn btn-group-toggle stn-sm'>
+          Toggle All
+        </button>
+      </div>
+      <br>
+<!--       <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <button class="btn btn-outline-secondary" type="button">Add</button>
+        </div>
+        <input type="text" class="form-control" placeholder="Add extra items (ingredient:qty) e.g eggs:12" aria-label="" aria-describedby="basic-addon1" id='addTodoInput'>
+      </div> -->
+      <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="Insert item in format Item:Qty e.g Eggs:12" aria-label="Extra Items" aria-describedby="basic-addon2" id='addTodoInput'>
+        <div class="input-group-append">
+          <button class="btn btn-outline-primary" type="button" id='addTodoButton'>Add</button>
+        </div>
+      </div>
+      <br>
+<!--       <div>
+        <button id='addTodoButton'>
+          Add
+        </button>
+        <input id='addTodoInput'>
+      </div> -->
+      <ul id='todo-Ul' style="list-style-type: none;">
+      </ul>
+  </center>
+
+<!--   <center>
+    {{ ingredient_list }}
     {% for f_type, ing_dict in ingredients.items %}
       <table>
         <caption style="caption-side: top; text-align: center;">{{f_type}}</caption>
@@ -38,5 +70,196 @@
       </table>
     {% endfor %}
       <br>
-  </center>
+  </center> -->
+
+  <script type="text/javascript">
+   var token = "{{csrf_token}}"
+   var testVar = "{{ingredient_list}}";
+   testVar = testVar.replaceAll('&#x27;',"");
+   testVar = testVar.replaceAll('None',"");
+   testVar = testVar.replace("[","");
+   testVar = testVar.replace("]","");
+   testVar = testVar.split(',');
+
+   // list of dictionaries [{'title':carrot:2,'Status':false}]
+
+   var todos = []
+
+   testVar.forEach(item => {
+    todos.push({"title":item,"Status":false});
+    showTodos();
+   })
+
+   function addTodo(){
+     var inputText = document.getElementById('addTodoInput');
+     todos.push({"title":inputText.value,"Status":false});
+
+     // empty text box again
+     inputText.value = "";
+     showTodos()
+   }
+
+   function showTodos(){
+
+     var ul = document.getElementById('todo-Ul');
+     // reset list each time to prevent duplication
+     ul.innerHTML = ""
+     
+     var counter = 0;
+
+     todos.forEach(item => {
+
+       if(item.title.includes(':')){
+
+        const text = document.createElement('span');
+        const link = document.createElement('a');
+        const edit = document.createElement('button');
+        const liItem = document.createElement('li');
+
+        link.setAttribute("style", "padding: 10px;")
+
+        liItem.className = 'ingredient';
+        liItem.appendChild(text);
+        liItem.appendChild(link);
+        liItem.appendChild(edit);
+
+        liItem.className = 'list-group-item list-group-item-action';
+
+        ul.appendChild(liItem);
+
+        link.id = counter;
+        link.href = "#";
+        link.className = "toggle"
+
+        edit.innerText = 'Update';
+        edit.className = 'btn btn-outline-light btn-sm';
+        edit.id = String(counter) + '_up';
+
+        text.innerText = item.title;
+
+        if(item.Status){
+          link.text = " ✅";
+          text.setAttribute("style", "text-decoration: line-through;")
+          // text.className = 'strike-through';
+        } else {
+          link.text = " ❌";
+          text.setAttribute("style", "")
+          // text.classList.remove('strike-through');
+        }
+
+       } else {
+        const text = document.createElement('span');
+        const liItem = document.createElement('li');
+
+        liItem.className = 'list-group-item active';
+
+        liItem.appendChild(text);
+        text.innerText = item.title;
+
+        ul.appendChild(liItem);
+       }
+
+       counter += 1;
+
+     });
+   }
+
+   function toggleTodo(evt){        
+     evt.preventDefault();
+     if (todos[evt.target.id].Status){
+       todos[evt.target.id].Status = false;
+     } else {
+       todos[evt.target.id].Status = true;
+     }
+     showTodos();
+   }
+
+   function toggleAll(){
+     var tot = 0;
+     var len = todos.length;
+
+     todos.forEach((item) => {
+       tot += item.Status;
+     });
+
+     if (tot === len){
+       todos.forEach((item) => {item.Status = false});
+     } else {
+       todos.forEach((item) => {item.Status = true});
+     }
+
+     showTodos();
+   }
+
+   function editTodo(evt){
+     var index = evt.target.id.split('_')[0]
+     todos[index].title = window.prompt('Update Ingredient: ',todos[index].title);
+
+     showTodos()
+   }
+
+   function toggleUpdate(evt){
+     if (evt.target.className === "btn btn-outline-light btn-sm"){
+       editTodo(evt);
+     } else {
+       toggleTodo(evt);
+     }
+   }
+
+   function concatTodos(){
+    
+    var final = [];
+    todos.forEach(item => {
+      if(item.Status == false){
+        final.push(item.title)
+      }
+    })
+
+    return final.join('\n');
+   }
+
+   function emailTodos(){
+
+    var content = concatTodos()
+
+    $.ajax({
+      type: 'POST',
+      url: 'http://localhost:8000/shopping_list/sendEmailAjax/',
+      dataType: 'html',
+      data: {
+        csrfmiddlewaretoken: token,
+        todoList: content,
+      },
+      success: function(){
+        console.log(testVar)
+        alert('completed AJAX');
+      },
+
+      // handle a non-successful response
+      error : function(xhr,errmsg,err) {
+          $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+              " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+          // console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+          console.log(errmsg)
+      }
+
+    });
+
+    console.log('AJAX has run?');
+   }
+
+   var addButton = document.getElementById('addTodoButton');
+   addButton.addEventListener("click",addTodo);
+
+   var ul = document.getElementById('todo-Ul');
+   ul.addEventListener("click",toggleUpdate, false);
+
+   var togAll = document.getElementById('toggleTodosButton');
+   togAll.addEventListener("click",toggleAll);
+
+   var emailTo = document.getElementsByClassName('btn btn-primary')[0]
+   emailTo.addEventListener("click",emailTodos);
+
+  </script>
 {% endblock content %}
+

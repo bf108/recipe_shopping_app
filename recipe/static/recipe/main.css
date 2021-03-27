@@ -92,3 +92,27 @@ a.article-title:hover {
 
   float: right;
 }
+
+.strike-through {
+  text-decoration: line-through;
+}
+
+.toggle {
+  text-decoration: none;
+  padding-right: 20px;
+}
+
+.button-container {
+  text-align: center;
+}
+
+.slide-out {
+  transition-property: transform;
+  transform: translateX(1000px);
+  transition: all 1.5s ease;
+  overflow: hidden;
+}
+
+.ingredient {
+  padding-right: 20px;
+}

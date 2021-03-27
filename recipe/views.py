@@ -6,6 +6,8 @@ from .forms import CreateShoppingListForm
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.http import HttpResponseRedirect
+from shop_App.settings import EMAIL_HOST_USER, EMAIL_HOST_PASSWORD
+
 
 # Create your views here.
 
@@ -126,6 +128,38 @@ def groupIngredients(recipes):
 
 	return toBuy
 
+def groupListIngredients(recipes):
+	toBuy = dict()
+
+	for recipe in recipes:
+		for ingredient in Ingredient.objects.filter(recipe__title=recipe).all():
+			if ingredient.food_type in toBuy:
+				if ingredient.title.lower() in toBuy[ingredient.food_type]:
+					toBuy[ingredient.food_type][ingredient.title.lower()]["qty"]+=ingredient.qty
+				else:
+					toBuy[ingredient.food_type][ingredient.title.lower()] = {
+					"qty":ingredient.qty,
+					"units":ingredient.units
+					}
+			else:
+				toBuy[ingredient.food_type] = {ingredient.title.lower():{
+				"qty":ingredient.qty,
+				"units":ingredient.units
+				}
+				}
+
+	toBuyList = []
+
+	for foodType in toBuy:
+		toBuyList.append(foodType)
+		for ing in toBuy[foodType]:
+			text = str(ing) + str(':')
+			text += str(toBuy[foodType][ing]['qty'])
+			text += str(toBuy[foodType][ing]['units'])
+			toBuyList.append(text)
+
+	return toBuyList
+
 class ShoppingDetailView(DetailView):
 	model = ShoppingList
 	template_name = 'recipe/spl_DetailView.html'
@@ -139,6 +173,8 @@ class ShoppingDetailView(DetailView):
 		recipes = [rec.title for rec in ShoppingList.objects.get(pk=self.kwargs['pk']).meals.all()]
 
 		context['ingredients'] = groupIngredients(recipes)
+
+		context['ingredient_list'] = groupListIngredients(recipes)
 
 		return context
 
@@ -191,10 +227,36 @@ def sendEmail(request):
 		'This weeks shopping list!',
 		createEmailBody(),
 		'farrellben2020@gmail.com',
-		['ben.farrell08@gmail.com'],#,'maddieross@gmail.com'],
+		['ben.farrell08@gmail.com',],
+		# ['ben.farrell08@gmail.com','maddieross@gmail.com'],
 		fail_silently=False,
 		)
 
 	messages.add_message(request, messages.SUCCESS, 'Shopping list emailed to Ben & Maddie!')
 
 	return HttpResponseRedirect(reverse('shoppingList_detail',args=[request.user.id]))
+
+def sendEmailAjax(request):
+
+	if request.method == 'POST':
+
+		content = request.POST.get('todoList')
+
+		send_mail(
+			'This weeks shopping list!',
+			content,
+			'farrellben2020@gmail.com',
+			['ben.farrell08@gmail.com'],
+			fail_silently=False,
+			)
+
+		todos = request.POST.get('todoList',"Couldn't Find it")
+
+		messages.add_message(request, messages.SUCCESS, f'Received Posted Data: {todos}')
+
+		return HttpResponseRedirect(reverse('shoppingList_detail',args=[request.user.id]))
+
+	else:
+		messages.add_message(request, messages.WARNING, 'Didn\'t receive any Posted Data')
+
+		return HttpResponseRedirect(reverse('shoppingList_detail',args=[request.user.id]))
