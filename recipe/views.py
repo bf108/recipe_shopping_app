@@ -243,12 +243,17 @@ def sendEmailAjax(request):
 	if request.method == 'POST':
 
 		content = request.POST.get('todoList')
+		recipientList = request.POST.get('recipientList').split('\n')
+
+		#Avoid requirements to include our emails every week.
+		if len(recipientList) == 0:
+			recipientList = ['ben.farrell08@gmail.com','maddieross@gmail.com']
 
 		send_mail(
 			'This weeks shopping list!',
 			content,
 			'farrellben2020@gmail.com',
-			['ben.farrell08@gmail.com'],
+			recipientList,
 			fail_silently=False,
 			)
 

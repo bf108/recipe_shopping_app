@@ -12,6 +12,15 @@
   <br>
   <center>
     <h4>Email Shopping List</h4>
+    <div class="input-group mb-3">
+      <input type="text" class="form-control" placeholder="Email Recipient" aria-label="Extra Items" aria-describedby="basic-addon2" id='addEmailRecepient'>
+      <div class="input-group-append">
+        <button class="btn btn-outline-primary" type="button" id='addEmailRecepientButton'>Add Email</button>
+      </div>
+    </div>
+    <ul id='emailListUl'>
+    </ul>
+    <br>
     <button type="button" class="btn btn-primary">Email Shopping List</button>
     <!-- Link to static email view -->
     <!-- <a href="{% url 'sendEmail' %}">Send Email</a> -->
@@ -73,6 +82,73 @@
   </center> -->
 
   <script type="text/javascript">
+
+    // emails in array. Each element is String
+    //'test@gmail.com'
+   var emails = [];
+
+   function addEmail(){
+    var emailValue = document.getElementById('addEmailRecepient').value;
+    emails.push(emailValue);
+
+    showEmails();
+
+    document.getElementById('addEmailRecepient').value = ''
+   }
+
+   function deleteEmail(evt){
+    // Check if delete link has been clicked
+    if (evt.target.className === 'toggle_email'){
+      // extract the index of event 
+      var indexEvent = parseInt(evt.target.id.split('_')[0]);
+      if (indexEvent > 0){
+        // If index > 0 use splice to remove email from array
+        emails.splice(indexEvent,indexEvent);
+      } else {
+        // Else remove first element.
+        emails.shift();
+      }
+    }
+    showEmails();
+   }
+
+   function showEmails(){
+
+    var ul = document.getElementById('emailListUl');
+    // reset list each time to prevent duplication
+    ul.innerHTML = ""
+    
+    var counter = 0;
+
+    emails.forEach(item => {
+
+       const text = document.createElement('span');
+       const link = document.createElement('a');
+       const liItem = document.createElement('li');
+
+       text.innerText = item;
+
+       link.setAttribute("style", "padding: 10px;")
+
+       liItem.appendChild(text);
+       liItem.appendChild(link);
+
+       liItem.className = 'list-group-item list-group-item-action';
+
+       ul.appendChild(liItem);
+
+       link.id = counter + "_emailAddress";
+       link.href = "#";
+       link.className = "toggle_email"
+       link.text = " ❌"
+
+      });
+    }
+    var addEmailButton = document.getElementById('addEmailRecepientButton');
+    addEmailButton.addEventListener("click",addEmail);
+
+    var emailAddressList = document.getElementById('emailListUl');
+    emailAddressList.addEventListener("click",deleteEmail,false);
 
    function formatter(x){
     x = x.replaceAll('&amp;',"&");
@@ -248,9 +324,9 @@
       data: {
         csrfmiddlewaretoken: token,
         todoList: content,
+        recipientList: emails.join('\n'),
       },
       success: function(){
-        console.log(testVar)
         alert('completed AJAX');
       },
 
@@ -276,7 +352,7 @@
    var togAll = document.getElementById('toggleTodosButton');
    togAll.addEventListener("click",toggleAll);
 
-   var emailTo = document.getElementsByClassName('btn btn-primary')[0]
+   var emailTo = document.getElementsByClassName('btn btn-primary')[0];
    emailTo.addEventListener("click",emailTodos);
 
   </script>
