@@ -25,3 +25,6 @@ class CreateShoppingListForm(ModelForm):
 
 	# 		self.fields['meals'].widget = CheckboxSelectMultiple()
 	# 		self.fields['meals'].queryset = Recipe.objects.all()
+
+class ContactForm(forms.Form):
+	recepient = forms.EmailField()
